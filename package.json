@@ -47,7 +47,8 @@
         "deb"
       ],
       "icon": "assets/icon.png",
-      "category": "Utility"
+      "category": "Utility",
+      "maintainer": "Amaan9136 <Amaan9136@users.noreply.github.com>"
     }
   }
 }
