@@ -23,7 +23,9 @@ kbd { font: 10px ui-monospace, monospace; color: #a9b8d7; background: #1b2942; b
 .profiles { display: flex; flex-direction: column; gap: 7px; overflow-y: auto; max-height: 390px; padding: 2px 3px 5px 0; }
 .profile { display: flex; align-items: center; width: 100%; text-align: left; gap: 12px; padding: 11px 13px; border: 1px solid transparent; border-radius: 12px; color: #e8edfa; background: #111a2b; cursor: pointer; transition: background .12s, border-color .12s; }
 .profile:hover, .profile.selected { background: #142b32; border-color: #20c997; }
-.avatar { width: 35px; height: 35px; flex: 0 0 35px; display: grid; place-items: center; border-radius: 11px; background: linear-gradient(145deg, #245b79, #1b3154); color: #d9f8f0; font-weight: 700; font-size: 13px; }
+.avatar { width: 35px; height: 35px; flex: 0 0 35px; display: grid; place-items: center; border-radius: 11px; background: linear-gradient(145deg, #245b79, #1b3154); color: #d9f8f0; font-weight: 700; font-size: 13px; overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.serial { flex: 0 0 20px; color: #6f81a3; font: 600 11px ui-monospace, monospace; text-align: right; }
 .profile-copy { min-width: 0; flex: 1; }
 .profile-name { display: block; font-size: 13px; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .profile-email { display: block; margin-top: 3px; color: #8f9fbd; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -8,6 +8,8 @@ It is made for people who keep separate Chrome profiles for personal accounts, w
 
 - Finds Chrome profiles automatically on Windows, macOS, and common Linux setups.
 - Searches profile names, account email addresses, and profile folder names.
+- Numbers every profile, so you can type a number and press Enter to open it.
+- Shows each profile's Google account picture when Chrome has one saved.
 - Supports keyboard navigation with the Up and Down arrow keys.
 - Opens the selected profile in Google Chrome.
 - Refreshes the list when you create or rename profiles.
@@ -31,7 +33,7 @@ It is made for people who keep separate Chrome profiles for personal accounts, w
 ### Run from source
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/chrome-quick-switch.git
+git clone https://github.com/Amaan9136/chrome-quick-switch.git
 cd chrome-quick-switch
 npm install
 npm start
@@ -57,9 +59,19 @@ Build output is placed in the `release` folder. Windows builds use NSIS, macOS b
 
 A macOS app should be built on macOS, and a Windows installer should be built on Windows. For release builds across all three systems, use the included GitHub Actions workflow.
 
+### Where the built app is stored
+
+Everything the build produces is placed in the `release` folder inside the project. It is ignored by Git.
+
+- Windows: the installer is `release\Chrome Quick Switch Setup 1.0.0.exe`. A ready-to-run copy that needs no install is `release\win-unpacked\Chrome Quick Switch.exe`.
+- macOS: the `.dmg` file in `release`.
+- Linux: the `.AppImage` and `.deb` files in `release`.
+
+After you run the Windows installer, the app is installed for your user account, usually under `%LOCALAPPDATA%\Programs`, and appears in the Start menu. Until you build or install it, `npm start` runs the app straight from the project folder.
+
 ## Where profile information comes from
 
-Chrome keeps a small profile index in a file named `Local State` inside its user data folder. This app reads the profile names, folder identifiers, and account email addresses from that index. It does not open or inspect individual profile databases.
+Chrome keeps a small profile index in a file named `Local State` inside its user data folder. This app reads the profile names, folder identifiers, and account email addresses from that index. It does not open or inspect individual profile databases. The only other file it reads is each profile's saved Google account picture, so avatars can be shown.
 
 Default locations:
 
@@ -82,6 +94,7 @@ The app needs access to Chrome's `Local State` file so it can display your profi
 | Key | Action |
 | --- | --- |
 | Type | Filter profiles |
+| Type a number | Show the profile with that number, then press Enter to open it |
 | Up / Down | Move through the results |
 | Enter | Open the selected profile |
 | Escape | Clear the search |
@@ -103,6 +116,33 @@ The app uses Chrome's profile index. Open the missing profile once in Chrome, th
 **I use more than one Chrome installation**
 
 This first version checks the standard Chrome locations. Custom user data directories and managed enterprise installations may need a future configuration option.
+
+**Electron failed to install correctly**
+
+This appears when you run `npm start` and Electron's download step did not finish, so its program file is missing. Check whether `node_modules\electron\dist\electron.exe` exists. If it does not, delete `node_modules`, run `npm install` again, then run the Electron installer by hand and read its output:
+
+```bash
+npm config get ignore-scripts
+node node_modules/electron/install.js
+```
+
+`ignore-scripts` should print `false`, and the `ELECTRON_SKIP_BINARY_DOWNLOAD` environment variable should not be set. If the download is blocked, set `ELECTRON_MIRROR` to a mirror and run the installer again. If it keeps failing on a very new Node version, run the installer with Node 22 and keep your own Node for everything else:
+
+```bash
+npx -y node@22 node_modules/electron/install.js
+```
+
+**The build fails with a symbolic link error on Windows**
+
+Turn on Developer Mode in Windows settings, or run the terminal as administrator, then run `npm run dist:win` again.
+
+**Profile pictures do not show**
+
+Only profiles signed in to a Google account have a saved picture. Other profiles show their initials. Open the profile once in Chrome, then press Refresh in the app.
+
+**Typing a number does not find a profile**
+
+Numbers follow the order of the full list, which is sorted by name, so they change when you add or rename profiles. A number higher than the profile count is treated as normal search text.
 
 ## Contributing
 

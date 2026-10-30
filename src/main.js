@@ -2,7 +2,8 @@ const { app, BrowserWindow, ipcMain, shell } = require("electron");
 const fs = require("node:fs");
 const path = require("node:path");
 const os = require("node:os");
-const { spawn } = require("node:child_process");
+const { pathToFileURL } = require("node:url");
+const { spawn, spawnSync } = require("node:child_process");
 
 let mainWindow;
 
@@ -23,8 +24,7 @@ function getChromeUserDataDir() {
 }
 
 function getProfiles() {
-  const userDataDir = getChromeUserDataDir();
-  const localStatePath = path.join(userDataDir, "Local State");
+  const localStatePath = path.join(getChromeUserDataDir(), "Local State");
   if (!fs.existsSync(localStatePath)) {
     throw new Error(`Chrome profile data was not found.\n\nChecked:\n${localStatePath}\n\nOpen Chrome once and try again. If you use Chromium or a custom profile folder, check the project README for configuration notes.`);
   }
@@ -33,12 +33,16 @@ function getProfiles() {
   const infoCache = state?.profile?.info_cache || {};
   return Object.entries(infoCache)
     .filter(([directory]) => !["Guest Profile", "System Profile"].includes(directory))
-    .map(([directory, info]) => ({
-      directory,
-      name: info?.name || directory,
-      email: info?.user_name || "",
-      avatar: info?.avatar_icon || ""
-    }))
+    .map(([directory, info]) => {
+      const picture = path.join(path.dirname(localStatePath), directory, info?.gaia_picture_file_name || "Google Profile Picture.png");
+      return {
+        directory,
+        name: info?.name || directory,
+        email: info?.user_name || "",
+        avatar: info?.avatar_icon || "",
+        picture: fs.existsSync(picture) ? pathToFileURL(picture).href : ""
+      };
+    })
     .sort((a, b) => a.name.localeCompare(b.name) || a.directory.localeCompare(b.directory));
 }
 
@@ -62,7 +66,7 @@ function findChromeExecutable() {
   return ["google-chrome", "google-chrome-stable", "chromium", "chromium-browser"]
     .find((command) => {
       try {
-        const result = require("node:child_process").spawnSync("which", [command], { encoding: "utf8" });
+        const result = spawnSync("which", [command], { encoding: "utf8" });
         return result.status === 0 && result.stdout.trim().length > 0;
       } catch { return false; }
     }) || "google-chrome";
@@ -70,12 +74,7 @@ function findChromeExecutable() {
 
 function launchProfile(directory) {
   const executable = findChromeExecutable();
-  let child;
-  if (process.platform === "darwin" && executable === "open") {
-    child = spawn("open", ["-a", "Google Chrome", "--args", `--profile-directory=${directory}`], { detached: true, stdio: "ignore" });
-  } else {
-    child = spawn(executable, [`--profile-directory=${directory}`], { detached: true, stdio: "ignore" });
-  }
+  const child = spawn(executable, [...(process.platform === "darwin" && executable === "open" ? ["-a", "Google Chrome", "--args"] : []), `--profile-directory=${directory}`], { detached: true, stdio: "ignore" });
   child.on("error", (error) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send("launch-error", `Could not start Chrome: ${error.message}`);

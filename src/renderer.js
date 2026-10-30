@@ -15,7 +15,7 @@ function initials(name) {
 
 function render() {
   const query = search.value.trim().toLowerCase();
-  filtered = allProfiles.filter(profile =>
+  filtered = /^\d+$/.test(query) && allProfiles[query - 1] ? [allProfiles[query - 1]] : allProfiles.filter(profile =>
     [profile.name, profile.email, profile.directory].some(value => (value || "").toLowerCase().includes(query))
   );
   selectedIndex = Math.min(selectedIndex, Math.max(0, filtered.length - 1));
@@ -37,9 +37,14 @@ function render() {
     button.setAttribute("role", "option");
     button.setAttribute("aria-selected", String(index === selectedIndex));
 
+    const serial = document.createElement("span");
+    serial.className = "serial";
+    serial.textContent = allProfiles.indexOf(profile) + 1;
+
     const avatar = document.createElement("span");
     avatar.className = "avatar";
     avatar.textContent = initials(profile.name);
+    if (profile.picture) avatar.replaceChildren(Object.assign(new Image(), { src: profile.picture, alt: "", onerror: () => { avatar.textContent = initials(profile.name); } }));
 
     const copy = document.createElement("span");
     copy.className = "profile-copy";
@@ -59,7 +64,7 @@ function render() {
     mark.className = "open-mark";
     mark.textContent = "↗";
 
-    button.append(avatar, copy, folder, mark);
+    button.append(serial, avatar, copy, folder, mark);
     button.addEventListener("mouseenter", () => { selectedIndex = index; updateSelection(); });
     button.addEventListener("click", () => openSelected(index));
     list.append(button);
