@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1020">
+  <title>Chrome Quick Switch</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header class="top">
+      <img src="app-icon.png" alt="" class="app-icon">
+      <div>
+        <p class="eyebrow">YOUR BROWSER, YOUR WORKSPACE</p>
+        <h1>Chrome Quick Switch</h1>
+        <p class="subtitle">Find a profile and jump straight into it.</p>
+      </div>
+      <button id="refresh" class="icon-button" title="Refresh profiles" aria-label="Refresh profiles">↻</button>
+    </header>
+
+    <section class="search-area">
+      <label for="search">Search your profiles</label>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input id="search" type="search" placeholder="Name, email, or profile folder..." autocomplete="off" autofocus>
+        <kbd>Enter</kbd>
+      </div>
+      <p class="hint">Start typing to filter. Use ↑ and ↓ to choose, then press Enter.</p>
+    </section>
+
+    <section class="results-head">
+      <span>Your profiles</span>
+      <span id="count" class="count">Loading…</span>
+    </section>
+    <section id="profiles" class="profiles" role="listbox" aria-label="Chrome profiles"></section>
+    <div id="message" class="message" role="status"></div>
+
+    <footer>
+      <span>Opens profiles in Google Chrome</span>
+      <span id="version"></span>
+    </footer>
+  </main>
+  <script src="renderer.js"></script>
+</body>
+</html>
