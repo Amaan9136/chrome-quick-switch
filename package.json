@@ -17,6 +17,9 @@
     "electron": "^37.2.6",
     "electron-builder": "^26.0.12"
   },
+  "overrides": {
+    "yauzl": "^3.4.0"
+  },
   "build": {
     "appId": "live.automatech.chromequickswitch",
     "productName": "Chrome Quick Switch",
